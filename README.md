@@ -1,2 +1,9 @@
-# Conways_game
-Conways game of life implementation in C
+# Conway's Game of life
+
+Usage
+```
+./life -f <FILE_OF_COORDINATES>
+
+# No parameters for randomization of coordinates
+./life
+```

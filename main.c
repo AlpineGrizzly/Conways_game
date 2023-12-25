@@ -11,12 +11,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define MILLISECOND(x) ((x % 1000 ) * 1000)
+
 /** Dimensions of the game of life field */
-#define DIM_X 50
-#define DIM_Y 20
+#define DIM_X 200
+#define DIM_Y 100
 
 /** States on the board */
-#define ALIVE '*'
+#define ALIVE 'O'
 #define DEAD  '.'
 
 struct Cell { 
@@ -40,7 +42,7 @@ int is_valid_coord(struct Cell coord) {
  * 
  * @return 1 if coordinates were successfully set, 0 otherwise
 */
-int init_life(char field[][DIM_Y], struct Cell coords[], int ncoords) { 
+int initcoords_life(char field[][DIM_Y], struct Cell coords[], int ncoords) { 
 	// Initialize the field array with empty spaces
 	for (int y = 0; y < DIM_Y; y++) { 
 		for (int x = 0; x < DIM_X; x++) { 
@@ -60,6 +62,52 @@ int init_life(char field[][DIM_Y], struct Cell coords[], int ncoords) {
 }
 
 /**
+ * init_life
+ * 
+ * Initializes the simulation from a file or a random set of starting values
+ * 
+ * @param field 2D array that stores the state of the field
+ * @param initfn Pointer to initialization file if one exists, if not random starting values will be used
+ * 
+ * @return 1 if initialization was successful, 0 otherwise
+*/
+int init_life(char field[][DIM_Y], char* initfn) { 
+	// Check if file exists
+	FILE* f; 
+	char ch;
+
+	// Initialize the field array with empty spaces
+	for (int y = 0; y < DIM_Y; y++) { 
+		for (int x = 0; x < DIM_X; x++) { 
+			field[x][y] = DEAD;
+		}
+	}
+
+	f = fopen(initfn, "r");
+	if (f == NULL) { 
+		printf("%s does not exist!\n", initfn);
+		return 0;
+	}
+
+	// Otherwise, initialize the field with the contents of the file
+	int x, y = 0;
+	do { 
+		ch = fgetc(f);
+
+		if (ch == ALIVE || ch == DEAD)
+			field[x][y] = ch;
+		else if (ch == '\n') { 
+			x = 0;
+			y++;
+		}
+		x++;
+	} while(ch != EOF);
+
+	fclose(f);
+	return 1;
+}
+
+/**
  * print_field 
  * 
  * Prints the field of life to the wonderful user
@@ -70,6 +118,7 @@ void print_field(char field[][DIM_Y]) {
 	for (int y = 0; y < DIM_Y; y++) { 
 		for (int x = 0; x < DIM_X; x++) { 
 			putc(field[x][y], stdout);
+			//putc(' ', stdout);
 		}
 		putc('\n', stdout);
 	}
@@ -126,7 +175,6 @@ int update(char curr_gen[][DIM_Y]) {
 			nalive = get_survivors(curr_gen, x, y); // Get number of cells alive current cell
 			
 			if (curr_gen[x][y] == ALIVE) { 
-				printf("(%d, %d) == Alive: %d\n", x, y, nalive);
 				if (nalive < 2 || nalive > 3) { 
 					// 1. Any live cell with fewer than two live neighbors dies (if by underpopulation)
 					// 2. Any live cell with more than three live neighbors dies (if by overpopulation)
@@ -153,31 +201,56 @@ int update(char curr_gen[][DIM_Y]) {
 	return population;
 }
 
+void usage() { 
+	char* usage_string = "Usage: life\n" 
+						 "Given an initialization file or generating its own starting values, will conduct a Conway's Game of Life simulation.\n\n" 
+						 "-h      Display this help message\n"  
+						 "-f      Starting values to be used for simulation (If none are supplied, will be randomly generated)\n";
+	printf("%s", usage_string);
+	exit(0);
+}
+
 int main(int argc, char* argv[]) { 	
-	int time = 0;                  // How many seconds have passed 
-	int population = 0;            // Number of alive cells in the simulation 
+	int time = 0;                // How many seconds have passed 
+	int population = 0;          // Number of alive cells in the simulation 
 	char curr_gen[DIM_X][DIM_Y]; // Initialize the generation fields
-	
+	int delay = 100;
+	int opt; 
+	char* init_fn = NULL;
+
+	// Parse arguments 
+	while ((opt = getopt(argc, argv, "hf:")) != -1) {
+        switch (opt) {
+        	case 'h': usage(); break;
+        	case 'f': init_fn = optarg; break;
+        default:
+            usage();
+        }
+    }
+
 	// User will supply a list of starting cells to initialize to alive
-	struct Cell coords[] = {
-		// Static box {1,1}, {1,2}, {2,2}, {2,1}
-		{5,5}, {5,7}, {6,6}, {6,7}, {7,6} // Glider
-		}; // hardcoded coordinates
-	int len = 5; // number of coordinatates
+	//struct Cell coords[DIM_X*DIM_Y];
+	//= {
+	////{1,1}, {1,2}, {2,2}, {2,1} // static
+	////{5,5}, {5,7}, {6,6}, {6,7}, {7,6}, // Glider
+	//{7,0}, {7,1}, {7,2}, {6,1}, {8,1}// Heart thing
+	////{7,7}, {7,8}, {7,9}
+	//}; // hardcoded coordinates
+	//int len = 5; // number of coordinates
 
 	// Generate the game board with list provided by user 
-	if(!init_life(curr_gen, coords, len)) { 
-		printf("Invalid Coordinates!\n");
+	if(!init_life(curr_gen, init_fn)) { 
+		printf("Unable to generate simulation!\n");
 		return 0;
 	}
 	
 	while(1) { 
-		printf("Time: %d Population: %d\n", time, population);
+		system("clear");    
+		printf("T %d Population: %d\n", time, population);
 		print_field(curr_gen);         // Print the field
 		population = update(curr_gen); // Update per Conway's rules
-		sleep(1);           
+		usleep(MILLISECOND(delay));           
 		time += 1;
-		system("clear");    
 	}
 
 	return 0;

@@ -12,8 +12,9 @@ Given an initialization file or generating its own starting values, will conduct
 
 Randomly generate a simulation of Conway's Game of life
 ```
-
+./life -r 
 ```
+![]https://github.com/AlpineGrizzly/Conways_game/blob/main/gifs/life_example.gif
 
 BUGS
 

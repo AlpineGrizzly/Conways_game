@@ -112,8 +112,8 @@ int init_life(char field[][DIM_Y], char* initfn, int random) {
 
 		/// begin filling in the cells 		
 		srand(time(0)); // Seed random number generator
-		for (y = 0; y < DIM_Y/2 ; y++) { 
-			for (x = 0; x < DIM_X/2; x++) { 
+		for (y = 0; y < DIM_Y; y++) { 
+			for (x = 0; x < DIM_X; x++) { 
 				if((rand() % 9) < CELL_SPAWN_CHANCE-1) { 
 					field[x][y] = ALIVE;
 					fputc(ALIVE, f);
@@ -125,7 +125,7 @@ int init_life(char field[][DIM_Y], char* initfn, int random) {
 		fputc('\n', f);
 		fclose(f);
 	}  
-	
+
 	printf("successfully generated\n");
 	f = fopen(initfn, "r");
 	if (f == NULL) { 
@@ -144,7 +144,7 @@ int init_life(char field[][DIM_Y], char* initfn, int random) {
 			y++;
 		}
 		x++;
-	} while(ch != EOF);
+	} while(ch != EOF && x < DIM_X && y < DIM_Y);
 
 	fclose(f);
 	return 1;

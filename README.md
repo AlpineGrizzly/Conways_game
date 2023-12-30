@@ -8,8 +8,11 @@ Usage
 ./life -r 
 ```
 
+BUGS
+- [X] Only able to randomly generate in a subset of totally grid size
+
 TODO
-- [ ] Allow randomization of cells when no file is provided
+- [X] Allow randomization of cells when no file is provided
 - [ ] Go a step further with smart randomization (Possible trained on AI to recongnize patterns that create automatons)
 - [ ] Dimensions when opening a file are jenky, place the coordinate field in the middle if possible
 - [ ] Wrapping when cells go off screen, toroidal 

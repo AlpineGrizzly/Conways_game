@@ -28,46 +28,6 @@
 #define ALIVE 'O'
 #define DEAD  '.'
 
-struct Cell { 
-	int x;
-	int y;
-};
-
-int is_valid_coord(struct Cell coord) { 
-	if (coord.x < 0 || coord.y < 0 || coord.x >= DIM_X || coord.y >= DIM_Y)
-		return 0;
-	return 1;
-}
-
-/**
- * init_life
- * 
- * Initializes the field with a set of coordinates to start as alive
- * 
- * @param field Game of life field
- * @param coords Array of coordinates to mark alive on the field
- * 
- * @return 1 if coordinates were successfully set, 0 otherwise
-*/
-int initcoords_life(char field[][DIM_Y], struct Cell coords[], int ncoords) { 
-	// Initialize the field array with empty spaces
-	for (int y = 0; y < DIM_Y; y++) { 
-		for (int x = 0; x < DIM_X; x++) { 
-			field[x][y] = DEAD;
-		}
-	}
-
-	// Validate and plot coordinates supplied by user
-	for (int c = 0; c < ncoords; c++) { 
-		if (is_valid_coord(coords[c]))
-			field[coords[c].x][coords[c].y] = ALIVE;
-		else
-			return 0; // Disapointment
-	}
-
-	return 1; // cool beans 
-}
-
 /**
  * init_life
  * 
@@ -244,11 +204,16 @@ int update(char curr_gen[][DIM_Y]) {
 	return population;
 }
 
+/**
+ * usage
+ * 
+ * Prints the usage of the program
+*/
 void usage() { 
 	char* usage_string = "Usage: life\n" 
 						 "Given an initialization file or generating its own starting values, will conduct a Conway's Game of Life simulation.\n\n" 
 						 "-h      Display this help message\n"  
-						 "-r      Will generate random starting cells and save off as a file to be used"
+						 "-r      Will generate random starting cells and save off as a file to be used\n"
 						 "-f      Starting values to be used for simulation (If none are supplied, will be randomly generated)\n";
 	printf("%s", usage_string);
 	exit(0);
@@ -273,6 +238,12 @@ int main(int argc, char* argv[]) {
             usage();
         }
     }
+
+	// If a file wasn't provided + randomization isn't turned on print usage
+	if (init_fn == NULL && !random_on) { 
+		usage();
+		return 0;
+	}
 
 	// Generate the game board with list provided by user 
 	if(!init_life(curr_gen, init_fn, random_on)) { 

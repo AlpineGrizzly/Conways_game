@@ -1,6 +1,6 @@
 # Conway's Game of life
 
-Usage
+## Usage
 ```
 Usage: life
 Given an initialization file or generating its own starting values, will conduct a Conway's Game of Life simulation.
@@ -14,11 +14,11 @@ Randomly generate a simulation of Conway's Game of life
 ```
 ./life -r 
 ```
-![]https://github.com/AlpineGrizzly/Conways_game/blob/main/gifs/life_example.gif
+![](https://github.com/AlpineGrizzly/Conways_game/blob/main/gifs/life_example.gif)
 
-BUGS
+## BUGS
 
-TODO
+## TODO
 - [ ] Allow input to size of the field
 - [ ] Dimensions when opening a file are jenky, place the coordinate field in the middle if possible
 - [ ] Wrapping when cells go off screen, toroidal 

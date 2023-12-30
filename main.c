@@ -10,12 +10,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <time.h>
+
+#define RAND_FILE "random-words.txt"
+#define LINE_COUNT 2642 // Number of lines in the random word file
+#define CELLS_DIR "cells/" // Directory where cells are stored
+#define CELL_SPAWN_CHANCE 4
 
 #define MILLISECOND(x) ((x % 1000 ) * 1000)
 
 /** Dimensions of the game of life field */
 #define DIM_X 200
-#define DIM_Y 100
+#define DIM_Y 50
 
 /** States on the board */
 #define ALIVE 'O'
@@ -68,32 +75,68 @@ int initcoords_life(char field[][DIM_Y], struct Cell coords[], int ncoords) {
  * 
  * @param field 2D array that stores the state of the field
  * @param initfn Pointer to initialization file if one exists, if not random starting values will be used
+ * @param random Boolean to set random starting cell values if true
  * 
  * @return 1 if initialization was successful, 0 otherwise
 */
-int init_life(char field[][DIM_Y], char* initfn) { 
+int init_life(char field[][DIM_Y], char* initfn, int random) { 
 	// Check if file exists
 	FILE* f; 
 	char ch;
-
+ 
 	// Initialize the field array with empty spaces
-	for (int y = 0; y < DIM_Y; y++) { 
-		for (int x = 0; x < DIM_X; x++) { 
+	int x, y = 0;
+	for (y = 0; y < DIM_Y; y++) { 
+		for (x = 0; x < DIM_X; x++) { 
 			field[x][y] = DEAD;
 		}
 	}
 
+	if (random) {
+		// Random generate a file with coordinates
+		/// Generate a random name for the .cells file
+		char cellname[80];
+		strcpy(cellname, CELLS_DIR);
+		strcat(cellname, "testfile");
+		strcat(cellname, ".cells");
+		initfn = cellname;
+
+		printf("writing to %s\n", initfn);
+
+		/// open it in write mode and randomly generate 
+		f = fopen(initfn, "w");
+		if(f == NULL) { 
+			printf("Unable to generate cells file\n");
+			return 0;
+		}
+
+		/// begin filling in the cells 		
+		srand(time(0)); // Seed random number generator
+		for (y = 0; y < DIM_Y/2 ; y++) { 
+			for (x = 0; x < DIM_X/2; x++) { 
+				if((rand() % 9) < CELL_SPAWN_CHANCE-1) { 
+					field[x][y] = ALIVE;
+					fputc(ALIVE, f);
+				} else
+					fputc(DEAD, f);
+			}
+			fputc('\n', f);
+		}
+		fputc('\n', f);
+		fclose(f);
+	}  
+	
+	printf("successfully generated\n");
 	f = fopen(initfn, "r");
 	if (f == NULL) { 
-		printf("%s does not exist!\n", initfn);
+		printf("File does not exist!\n");
 		return 0;
 	}
 
 	// Otherwise, initialize the field with the contents of the file
-	int x, y = 0;
+	x, y = 0;
 	do { 
 		ch = fgetc(f);
-
 		if (ch == ALIVE || ch == DEAD)
 			field[x][y] = ch;
 		else if (ch == '\n') { 
@@ -115,10 +158,10 @@ int init_life(char field[][DIM_Y], char* initfn) {
  * @param field Field to print
 */
 void print_field(char field[][DIM_Y]) { 
-	for (int y = 0; y < DIM_Y; y++) { 
-		for (int x = 0; x < DIM_X; x++) { 
+	int x, y;
+	for (y = 0; y < DIM_Y; y++) { 
+		for (x = 0; x < DIM_X; x++) { 
 			putc(field[x][y], stdout);
-			//putc(' ', stdout);
 		}
 		putc('\n', stdout);
 	}
@@ -205,6 +248,7 @@ void usage() {
 	char* usage_string = "Usage: life\n" 
 						 "Given an initialization file or generating its own starting values, will conduct a Conway's Game of Life simulation.\n\n" 
 						 "-h      Display this help message\n"  
+						 "-r      Will generate random starting cells and save off as a file to be used"
 						 "-f      Starting values to be used for simulation (If none are supplied, will be randomly generated)\n";
 	printf("%s", usage_string);
 	exit(0);
@@ -216,34 +260,27 @@ int main(int argc, char* argv[]) {
 	char curr_gen[DIM_X][DIM_Y]; // Initialize the generation fields
 	int delay = 100;
 	int opt; 
+	int random_on = 0;           // Boolean switch for enable randomized starting cell values
 	char* init_fn = NULL;
 
 	// Parse arguments 
-	while ((opt = getopt(argc, argv, "hf:")) != -1) {
+	while ((opt = getopt(argc, argv, "hrf:")) != -1) {
         switch (opt) {
         	case 'h': usage(); break;
+			case 'r': random_on = 1; break;
         	case 'f': init_fn = optarg; break;
         default:
             usage();
         }
     }
 
-	// User will supply a list of starting cells to initialize to alive
-	//struct Cell coords[DIM_X*DIM_Y];
-	//= {
-	////{1,1}, {1,2}, {2,2}, {2,1} // static
-	////{5,5}, {5,7}, {6,6}, {6,7}, {7,6}, // Glider
-	//{7,0}, {7,1}, {7,2}, {6,1}, {8,1}// Heart thing
-	////{7,7}, {7,8}, {7,9}
-	//}; // hardcoded coordinates
-	//int len = 5; // number of coordinates
-
 	// Generate the game board with list provided by user 
-	if(!init_life(curr_gen, init_fn)) { 
+	if(!init_life(curr_gen, init_fn, random_on)) { 
 		printf("Unable to generate simulation!\n");
 		return 0;
 	}
 	
+	// Simulation while loop 
 	while(1) { 
 		system("clear");    
 		printf("T %d Population: %d\n", time, population);

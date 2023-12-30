@@ -1,5 +1,5 @@
 #!/bin/bash
 
-#./life -f init_files/heart.txt
-#./life -f init_files/gosperguninlineinverter.txt
-./life -f init_files/p6diagonalwickstretcher1.cells
+#./life -f cells/heart.cells
+#./life -f cells/gosperguninlineinverter.cells
+./life -f cells/p6diagonalwickstretcher1.cells

@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) {
 	int time = 0;                // How many seconds have passed 
 	int population = 0;          // Number of alive cells in the simulation 
 	char curr_gen[DIM_X][DIM_Y]; // Initialize the generation fields
-	int delay = 100;
-	int opt; 
+	int delay = 100;             // Delay of each life update in milliseconds
+	int opt;
 	int random_on = 0;           // Boolean switch for enable randomized starting cell values
 	char* init_fn = NULL;
 
@@ -49,10 +49,7 @@ int main(int argc, char* argv[]) {
     }
 
 	// If a file wasn't provided + randomization isn't turned on print usage
-	if (init_fn == NULL && !random_on) { 
-		usage();
-		return 0;
-	}
+	if (init_fn == NULL && !random_on) { usage(); }
 
 	// Generate the game board with list provided by user 
 	if(!init_life(curr_gen, init_fn, random_on)) { 

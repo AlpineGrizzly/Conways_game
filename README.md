@@ -17,7 +17,7 @@ Randomly generate a simulation of Conway's Game of life
 ![](https://github.com/AlpineGrizzly/Conways_game/blob/main/gifs/life_example.gif)
 
 ## BUGS
-- [ ] Accepting an existing file is currently broken 
+- [X] Accepting an existing file is currently broken 
 
 ## TODO
 - [ ] Allow input to size of the field

@@ -147,8 +147,9 @@ int init_life(char field[][DIM_Y], char* initfn, int random) {
 			return 0;
 		}
 
-		/// begin filling in the cells 		
 		srand(time(0)); // Seed random number generator
+
+		/// begin filling in the cells 		
 		for (y = 0; y < DIM_Y; y++) { 
 			for (x = 0; x < DIM_X; x++) { 
 				if((rand() % 9) < CELL_SPAWN_CHANCE-1) { 
@@ -170,19 +171,22 @@ int init_life(char field[][DIM_Y], char* initfn, int random) {
 		return 0;
 	}
 
+	printf("Reading %s\n", initfn);
 	// Otherwise, initialize the field with the contents of the file
-	x, y = 0;
+	x = 0; 
+	y = 0;
 	do { 
+		printf("yippe %c %d %d\n", ch, x ,y );
 		ch = fgetc(f);
-		if (ch == ALIVE || ch == DEAD)
+		if (ch == ALIVE || ch == DEAD) { 
 			field[x][y] = ch;
-		else if (ch == '\n') { 
+		} else { 
 			x = 0;
 			y++;
 		}
 		x++;
-	} while(ch != EOF && x < DIM_X && y < DIM_Y);
-
+	} while(ch != EOF && x <= DIM_X+1 && y < DIM_Y);
+	
 	fclose(f);
 	return 1;
 }

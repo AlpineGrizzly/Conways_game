@@ -94,9 +94,15 @@ int get_survivors(char field[][DIM_Y], int c_x, int c_y) {
 	int y, x;
 	for (y = c_y-1; y <= c_y+1; y++) { 
 		for (x = c_x-1; x <= c_x+1; x++) { 
-			if ((x == c_x && y == c_y) || x < 0 || y < 0 || x >= DIM_X || y >= DIM_Y)
+			if (x == c_x && y == c_y)
 				continue; // Base case : Do not count the target cells state && Non existent neighbor 
-			if (field[x][y] == ALIVE) {
+			if (x < 0 || y < 0 || x >= DIM_X || y >= DIM_Y) { // Wrap to find states if we are on an x or y edge
+				    int wrap_x = ((x % DIM_X) + DIM_X) % DIM_X;
+    				int wrap_y = ((y % DIM_Y) + DIM_Y) % DIM_Y;
+					//printf("%d %d Checking instead %d %d\n", x, y, wrap_x, wrap_y);
+					if(field[wrap_x][wrap_y] == ALIVE)
+						count++;
+			} else if (field[x][y] == ALIVE) {
 				count++;
 			}
 		}

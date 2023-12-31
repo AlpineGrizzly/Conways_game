@@ -7,7 +7,7 @@
 
 /** Dimensions of the game of life field */
 #define DIM_X 200
-#define DIM_Y 50
+#define DIM_Y 100
 
 /** States on the board */
 #define ALIVE 'O'

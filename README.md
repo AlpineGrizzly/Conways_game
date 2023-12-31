@@ -17,12 +17,10 @@ Randomly generate a simulation of Conway's Game of life
 ![](https://github.com/AlpineGrizzly/Conways_game/blob/main/gifs/life_example.gif)
 
 ## BUGS
-- [X] Accepting an existing file is currently broken 
 
 ## TODO
 - [ ] Allow input to size of the field
-- [ ] Dimensions when opening a file are jenky, place the coordinate field in the middle if possible
-- [ ] Wrapping when cells go off screen, toroidal 
+- [X] Wrapping when cells go off screen, toroidal 
 - [ ] Simulation field will be displayed in ncurses
 
 FUTURE ADDITIONS
